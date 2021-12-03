@@ -1,7 +1,7 @@
 from xml.etree import ElementTree as ET
 
 
-class Parser:
+class ShardParser:
 
     """
     Parses an XML object from a string.
