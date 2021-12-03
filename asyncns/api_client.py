@@ -1,5 +1,6 @@
 import aiohttp
 from utils.ratelimit import Limiter
+from xml.etree import ElementTree
 
 limiter = Limiter(limit=50, interval=30)
 
@@ -18,6 +19,42 @@ class ApiClient:
             "User-Agent": self.useragent,
         }
         self.session = aiohttp.ClientSession()
+
+    @limiter
+    async def dispatch(self, data: dict, password: str):
+        """
+        Makes a post request to the NS API to prepare the dispatch private command.
+        Parses the response for the token, then executes the request with the token appended.
+        :param data:
+        :param password:
+        :return:
+        """
+        # Add the password to the headers
+        self.headers.update({"X-Password": password})
+        response = await self.session.post(
+            "https://www.nationstates.net/cgi-bin/api.cgi",
+            data=data,
+            headers=self.headers,
+        )
+        # The API returns data in the form of an XML document, so we parse it here
+        response_data = await response.text()
+        # The token is contained in a <SUCCESS> tag
+        root = ElementTree.fromstring(response_data)
+        token = root.find("SUCCESS").text
+        # The dispatch command requires the token to be appended to the URL
+        data.update({"token": token})
+        # Execute the command
+        final = await self.session.post(
+            "https://www.nationstates.net/cgi-bin/api.cgi",
+            data=data,
+            headers=self.headers,
+        )
+        if final.status == 200:
+            print("Dispatch posted successfully.")
+        else:
+            print("Dispatch failed.")
+            text = await final.text()
+            print(text)
 
     @limiter
     async def _get(self, url: str, params: dict = None, private: bool = False):
