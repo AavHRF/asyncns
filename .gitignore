@@ -4,3 +4,9 @@
 # IDE files
 .idea/
 .vscode/
+
+# PyPi files
+dist/
+asyncns.egg-info/
+asyncns_Aav.egg-info/
+setup.cfg
