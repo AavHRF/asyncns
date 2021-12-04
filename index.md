@@ -1,37 +1,73 @@
-## Welcome to GitHub Pages
+# Welcome to `asyncns`!
 
-You can use the [editor on GitHub](https://github.com/AavHRF/asyncns/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+`asyncns` is a library for asynchronous requests to the NationStates API. It operates at a high level,
+and is designed in a way to make your life easier while interacting with the API.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+To that end, `asyncns` contains a `utils` module, which contains a number of utility functions for making requests easier,
+like a parameter generator, and a built-in XML parser.
 
-### Markdown
+**WARNING** : `asyncns` is still in development, and may change in the future.
+Functions may change or be removed without warning. If you like the way `asyncns` works,
+pin your version to that particular version in your `requirements.txt` file.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+*Some Notes*:
+* `asyncns` adheres to [semantic versioning](https://semver.org/) for versioning. This means that
+any breaking changes to the library will be reflected in the major (i.e. 1.0.0) version number.
+* `asyncns` is written in [Python 3](https://www.python.org/downloads/). It will not work with Python 2.
 
-```markdown
-Syntax highlighted code block
+[Main Page](index.md) | [`utils` Documentation](docs/utils.md) | [GitHub](https://github.com/AavHRF/asyncns) | [License](LICENSE.md)
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+# Getting Started
+```python
+# Example start for asyncns
+import asyncio
+from asyncns import ApiClient
+client = ApiClient(useragent="Nation: YourNation")
+# Get the event loop
+loop = asyncio.get_event_loop()
+# Find information on Europe
+europe = loop.run_until_complete(client.get_region("europe"))
+# You can also get a specific shard
+europe2 = loop.run_until_complete(
+    client.get_region(
+        region="europe",
+        shard="numnations"
+    )
+)
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+# API Reference
 
-### Jekyll Themes
+### `asyncns.api_client`
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/AavHRF/asyncns/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+**Class**: `asyncns.api_client.ApiClient`
 
-### Support or Contact
+**Class Methods**:
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+*Async* `asyncns.api_client.ApiClient.dispatch()`
+
+| Parameter | Type   | Description                 |
+|-----------|--------|-----------------------------|
+| `data`    | `dict` | The data to send to the API |
+*Async* `asyncns.api_client.ApiClient.get_nation()`
+
+| Parameter | Type  | Description                                                  |
+|-----------|-------|--------------------------------------------------------------|
+| `nation`  | `str` | The nation                                                   |
+| `shard`   | `str` | The shard that you are requesting information on. (Optional) |
+
+*Async* `asyncns.api_client.ApiClient.get_region()`
+
+| Parameter | Type  | Description                                                  |
+|-----------|-------|--------------------------------------------------------------|
+| `region`  | `str` | The nation                                                   |
+| `shard`   | `str` | The shard that you are requesting information on. (Optional) |
+
+**Internal Methods**:
+
+*Async* `asyncns.api_client.ApiClient._get()`
+> Document later
+
+*Async* `asyncns.api_client.ApiClient._post()`
+> Document later
