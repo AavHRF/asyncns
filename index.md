@@ -50,6 +50,7 @@ europe2 = loop.run_until_complete(
 | Parameter | Type   | Description                 |
 |-----------|--------|-----------------------------|
 | `data`    | `dict` | The data to send to the API |
+
 *Async* `asyncns.api_client.ApiClient.get_nation()`
 
 | Parameter | Type  | Description                                                  |
