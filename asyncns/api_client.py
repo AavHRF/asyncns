@@ -1,8 +1,8 @@
 import aiohttp
-from utils.ratelimit import Limiter
+import utils
 from xml.etree import ElementTree
 
-limiter = Limiter(limit=50, interval=30)
+limiter = utils.Limiter(limit=50, interval=30)
 
 
 class ApiClient:
@@ -21,16 +21,17 @@ class ApiClient:
         self.session = aiohttp.ClientSession()
 
     @limiter
-    async def dispatch(self, data: dict, password: str):
+    async def dispatch(self, data: dict) -> str:
         """
         Makes a post request to the NS API to prepare the dispatch private command.
         Parses the response for the token, then executes the request with the token appended.
+        You must set a password with client.password before calling this method.
         :param data:
-        :param password:
-        :return:
+        :return: The XML response from the API
+        :rtype: str
         """
-        # Add the password to the headers
-        self.headers.update({"X-Password": password})
+        # Set the password in the headers
+        self.headers.update({"X-Password": self.password})
         response = await self.session.post(
             "https://www.nationstates.net/cgi-bin/api.cgi",
             data=data,
@@ -43,6 +44,13 @@ class ApiClient:
         token = root.find("SUCCESS").text
         # The dispatch command requires the token to be appended to the URL
         data.update({"token": token})
+        # Change from prepare to execute
+        data.update({"mode": "execute"})
+        # Get the X-Pin header and set it in the headers
+        x_pin = response.headers["X-Pin"]
+        self.headers.update({"X-Pin": x_pin})
+        # Pop the password from the headers
+        self.headers.pop("X-Password")
         # Execute the command
         final = await self.session.post(
             "https://www.nationstates.net/cgi-bin/api.cgi",
@@ -51,13 +59,15 @@ class ApiClient:
         )
         if final.status == 200:
             print("Dispatch posted successfully.")
+            text = await final.text()
+            return text
         else:
             print("Dispatch failed.")
             text = await final.text()
-            print(text)
+            return text
 
     @limiter
-    async def _get(self, url: str, params: dict = None, private: bool = False):
+    async def _get(self, url: str, params: dict = None, private: bool = False) -> str:
         """
         Perform a GET request to the API.
 
@@ -79,7 +89,7 @@ class ApiClient:
             return text
 
     @limiter
-    async def _post(self, url: str, data: dict = None, private: bool = False):
+    async def _post(self, url: str, data: dict = None, private: bool = False) -> str:
         """
         Perform a POST request to the API.
 
@@ -101,7 +111,7 @@ class ApiClient:
                 text = await response.text()
             return text
 
-    async def get_nation(self, nation: str, shard: str = None):
+    async def get_nation(self, nation: str, shard: str = None) -> str:
         """
         Performs a lookup on a nation.
 
@@ -124,7 +134,7 @@ class ApiClient:
             }
             return await self._get(url, params=params)
 
-    async def get_region(self, region: str, shard: str = None):
+    async def get_region(self, region: str, shard: str = None) -> str:
         """
         Performs a lookup on a region.
 
@@ -147,7 +157,7 @@ class ApiClient:
             }
             return await self._get(url, params=params)
 
-    async def world_api(self, shard: str):
+    async def world_api(self, shard: str) -> str:
         """
         Queries the World API.
 

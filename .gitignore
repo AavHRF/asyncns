@@ -1,5 +1,6 @@
 # Project files
 /venv
+/examples/examplevenv
 
 # IDE files
 .idea/
@@ -8,5 +9,3 @@
 # PyPi files
 dist/
 asyncns.egg-info/
-asyncns_Aav.egg-info/
-setup.cfg
