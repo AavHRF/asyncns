@@ -2,7 +2,7 @@
 
 ## Useful Links
 * [GitHub](https://github.com/AavHRF/asyncns)
-* [pypi](https://pypi.org/project/asyncns/)
+* [pypi](https://pypi.org/project/asyncns/) *Note: This currently does not work and you must pull from Git to get a functional version of the library.*
 * [The Docs](https://aavhrf.github.io/asyncns/)
 
 ## FAQs:
